@@ -10,7 +10,7 @@ export const getAllComplaints = async (req, res) => {
     if (status) filter.status = status;
 
     const complaints = await Complaint.find(filter)
-      .populate('userId', 'name email')
+      .populate('userId', 'name email phone')
       .sort({ priority: -1, createdAt: -1 });
 
     res.status(200).json({

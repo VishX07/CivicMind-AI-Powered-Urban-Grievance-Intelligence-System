@@ -1,67 +1,38 @@
 // src/pages/AdminDashboard.jsx
 import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import api from '../services/api';
 
 const AdminDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({});
-
-  const categories = [
-    'Waste Management',
-    'Water Supply',
-    'Road Damage',
-    'Streetlights',
-    'Sanitation',
-    'Others',
-  ];
-  const statuses = ['processing', 'open', 'in-progress', 'resolved'];
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editComplaint, setEditComplaint] = useState(null);
 
   useEffect(() => {
     fetchComplaints();
-  }, [selectedCategory, selectedStatus]);
+  }, []);
+
+  useEffect(() => {
+    const socket = io('http://localhost:5000');
+
+    socket.on('newComplaint', (newComplaint) => {
+      setComplaints((prev) => [newComplaint, ...prev]);
+    });
+
+    return () => socket.disconnect();
+  }, []);
 
   const fetchComplaints = async () => {
-    setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (selectedCategory) params.append('category', selectedCategory);
-      if (selectedStatus) params.append('status', selectedStatus);
-
-      const { data } = await api.get(`/admin/complaints?${params.toString()}`);
+      const { data } = await api.get('/admin/complaints');
       setComplaints(data.data);
-    } catch (error) {
-      console.error('Error fetching complaints:', error);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleEdit = (complaint) => {
-    setEditingId(complaint._id);
-    setEditForm({
-      status: complaint.status,
-      category: complaint.category,
-      priority: complaint.priority,
-    });
-  };
-
-  const handleUpdate = async (id) => {
-    try {
-      await api.patch(`/admin/complaints/${id}`, editForm);
-      setEditingId(null);
-      fetchComplaints();
-    } catch (error) {
-      console.error('Error updating complaint:', error);
-    }
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditForm({});
   };
 
   const getPriorityColor = (priority) => {
@@ -74,214 +45,233 @@ const AdminDashboard = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'resolved':
-        return 'bg-green-900/50 text-green-300';
+        return 'bg-green-900/40 text-green-300';
       case 'in-progress':
-        return 'bg-blue-900/50 text-blue-300';
+        return 'bg-blue-900/40 text-blue-300';
       case 'open':
-        return 'bg-yellow-900/50 text-yellow-300';
+        return 'bg-yellow-900/40 text-yellow-300';
       case 'processing':
-        return 'bg-purple-900/50 text-purple-300';
+        return 'bg-purple-900/40 text-purple-300';
       default:
         return 'bg-slate-700 text-slate-300';
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold text-slate-100 mb-6">
-        Admin Dashboard
-      </h2>
-
-      <div className="bg-slate-800 rounded-lg p-4 mb-6 border border-slate-700">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2 text-slate-300">
-              Filter by Category
-            </label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2 text-slate-300">
-              Filter by Status
-            </label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Statuses</option>
-              {statuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <h2 className="text-3xl font-bold text-white mb-8">Admin Dashboard</h2>
 
       {loading ? (
-        <div className="text-center text-slate-300 py-12">Loading...</div>
-      ) : complaints.length === 0 ? (
-        <div className="bg-slate-800 rounded-lg p-8 border border-slate-700 text-center text-slate-300">
-          No complaints found
-        </div>
+        <div className="text-center text-slate-400">Loading...</div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-6">
           {complaints.map((complaint) => (
             <div
               key={complaint._id}
-              className="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-slate-600 transition-colors"
+              className="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  {editingId === complaint._id ? (
-                    <div className="space-y-3 mb-4">
-                      <div className="grid grid-cols-3 gap-3">
-                        <div>
-                          <label className="block text-xs text-slate-400 mb-1">
-                            Category
-                          </label>
-                          <select
-                            value={editForm.category}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                category: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            {categories.map((cat) => (
-                              <option key={cat} value={cat}>
-                                {cat}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+              <div className="flex flex-col lg:flex-row gap-8">
+                {/* LEFT SECTION */}
+                <div className="flex-1 space-y-4">
+                  {/* Header Row */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-blue-400 font-semibold text-lg">
+                      {complaint.category}
+                    </span>
 
-                        <div>
-                          <label className="block text-xs text-slate-400 mb-1">
-                            Status
-                          </label>
-                          <select
-                            value={editForm.status}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                status: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            {statuses.map((status) => (
-                              <option key={status} value={status}>
-                                {status}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        complaint.status,
+                      )}`}
+                    >
+                      {complaint.status}
+                    </span>
 
-                        <div>
-                          <label className="block text-xs text-slate-400 mb-1">
-                            Priority (0-10)
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            max="10"
-                            value={editForm.priority}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                priority: parseInt(e.target.value),
-                              })
-                            }
-                            className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
+                    <span
+                      className={`font-bold ${getPriorityColor(
+                        complaint.priority,
+                      )}`}
+                    >
+                      Priority {complaint.priority}
+                    </span>
+                  </div>
 
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleUpdate(complaint._id)}
-                          className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-500 transition-colors"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={handleCancel}
-                          className="bg-slate-600 text-white px-4 py-2 rounded text-sm hover:bg-slate-500 transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
+                  {/* Description */}
+                  <p className="text-slate-300 leading-relaxed">
+                    {complaint.description}
+                  </p>
+
+                  {/* Address */}
+                  {complaint.address && (
+                    <div className="text-slate-400 text-sm">
+                      📍 {complaint.address}
                     </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span className="text-blue-400 font-medium">
-                          {complaint.category}
-                        </span>
-                        <span
-                          className={`px-3 py-1 rounded text-sm ${getStatusColor(complaint.status)}`}
-                        >
-                          {complaint.status}
-                        </span>
-                        <span
-                          className={`font-bold ${getPriorityColor(complaint.priority)}`}
-                        >
-                          Priority: {complaint.priority}
-                        </span>
-                      </div>
-                      <p className="text-slate-300 mb-3">
-                        {complaint.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-slate-400">
-                          <span>By: {complaint.userId?.name || 'Unknown'}</span>
-                          <span>•</span>
-                          <span>
-                            {new Date(complaint.createdAt).toLocaleDateString()}
-                          </span>
-                          <span>•</span>
-                          <span>
-                            Location: {complaint.latitude.toFixed(4)},{' '}
-                            {complaint.longitude.toFixed(4)}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => handleEdit(complaint)}
-                          className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-500 transition-colors"
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    </>
                   )}
+
+                  {/* User Info */}
+                  <div className="text-sm text-slate-400 space-y-1 pt-2 border-t border-slate-700">
+                    <div>👤 {complaint.userId?.name || 'Unknown'}</div>
+                    {complaint.userId?.phone && (
+                      <div>📞 {complaint.userId.phone}</div>
+                    )}
+                    <div>
+                      📅 {new Date(complaint.createdAt).toLocaleDateString()}
+                    </div>
+                    <div>
+                      📌 {complaint.latitude.toFixed(4)},{' '}
+                      {complaint.longitude.toFixed(4)}
+                    </div>
+                  </div>
                 </div>
-                {complaint.imageUrl && (
-                  <img
-                    src={complaint.imageUrl}
-                    alt="Complaint"
-                    className="w-24 h-24 object-cover rounded ml-4"
-                  />
-                )}
+
+                {/* RIGHT SECTION */}
+                <div className="w-full lg:w-64 flex flex-col items-center gap-4">
+                  {complaint.imageUrl && (
+                    <img
+                      src={complaint.imageUrl}
+                      alt="Complaint"
+                      onClick={() => setSelectedImage(complaint.imageUrl)}
+                      className="w-full h-48 object-cover rounded-xl cursor-pointer hover:opacity-80 transition"
+                    />
+                  )}
+
+                  <div className="w-full flex flex-col gap-3">
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${complaint.latitude},${complaint.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg text-center text-sm font-medium transition"
+                    >
+                      Open in Maps
+                    </a>
+                    <button
+                      onClick={() => {
+                        setEditComplaint(complaint);
+                        setEditModalOpen(true);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-sm font-medium transition"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {editModalOpen && editComplaint && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-lg">
+            <h3 className="text-xl font-semibold text-white mb-4">
+              Edit Complaint
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">
+                  Status
+                </label>
+                <select
+                  value={editComplaint.status}
+                  onChange={(e) =>
+                    setEditComplaint({
+                      ...editComplaint,
+                      status: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
+                >
+                  <option value="processing">processing</option>
+                  <option value="open">open</option>
+                  <option value="in-progress">in-progress</option>
+                  <option value="resolved">resolved</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">
+                  Category
+                </label>
+                <select
+                  value={editComplaint.category}
+                  onChange={(e) =>
+                    setEditComplaint({
+                      ...editComplaint,
+                      category: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
+                >
+                  <option>Waste Management</option>
+                  <option>Water Supply</option>
+                  <option>Road Damage</option>
+                  <option>Streetlights</option>
+                  <option>Sanitation</option>
+                  <option>Others</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">
+                  Priority
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={editComplaint.priority}
+                  onChange={(e) =>
+                    setEditComplaint({
+                      ...editComplaint,
+                      priority: parseInt(e.target.value),
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={async () => {
+                    await api.patch(`/admin/complaints/${editComplaint._id}`, {
+                      status: editComplaint.status,
+                      category: editComplaint.category,
+                      priority: editComplaint.priority,
+                    });
+
+                    setEditModalOpen(false);
+                    fetchComplaints();
+                  }}
+                  className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg"
+                >
+                  Save
+                </button>
+
+                <button
+                  onClick={() => setEditModalOpen(false)}
+                  className="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div
+          onClick={() => setSelectedImage(null)}
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
+        >
+          <img
+            src={selectedImage}
+            alt="Full View"
+            className="max-w-full max-h-full rounded-xl"
+          />
         </div>
       )}
     </div>

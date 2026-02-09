@@ -1,11 +1,12 @@
-// controllers/complaintController.js (UPDATE)
+// controllers/complaintController.js
 import Complaint from '../models/Complaint.js';
 import uploadToCloudinary from '../utils/cloudinaryUpload.js';
 import callAIService from '../utils/aiService.js';
+import { io } from '../server.js';
 
 export const createComplaint = async (req, res) => {
   try {
-    const { description, latitude, longitude } = req.body;
+    const { description, latitude, longitude, address } = req.body;
 
     if (!description || !latitude || !longitude) {
       return res.status(400).json({
@@ -18,6 +19,13 @@ export const createComplaint = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Description must be at least 10 characters',
+      });
+    }
+
+    if (address && address.length < 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Address must be at least 5 characters',
       });
     }
 
@@ -36,6 +44,7 @@ export const createComplaint = async (req, res) => {
       imageUrl,
       latitude,
       longitude,
+      address: address || '',
       status: 'processing',
     });
 
@@ -46,6 +55,12 @@ export const createComplaint = async (req, res) => {
     complaint.status = 'open';
 
     await complaint.save();
+
+    // Populate userId before emitting
+    await complaint.populate('userId', 'name email');
+
+    // Emit real-time update to all connected clients
+    io.emit('newComplaint', complaint);
 
     res.status(201).json({
       success: true,
