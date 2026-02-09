@@ -1,139 +1,214 @@
-# CivicMind – AI-Powered Urban Grievance Intelligence System
+# Smart Urban Grievance & Service Response System
 
-CivicMind is a smart urban grievance management platform that uses **AI (NLP, ML, LLM-ready)** to automatically classify, prioritize, and summarize citizen complaints for faster municipal response and better governance transparency.
+A centralized AI-powered grievance management platform built using MERN Stack and Python FastAPI.
 
-This project is being built for a hackathon and focuses on **end-to-end AI + system integration**, not just models.
-
----
-
-## 🚀 Problem Statement
-Municipal corporations receive thousands of complaints daily related to:
-- waste management
-- water supply
-- road damage
-- streetlights
-- sanitation
-
-These complaints are often:
-- manually processed
-- poorly prioritized
-- slow to resolve
-- hard to track
-
-CivicMind solves this using **AI-driven automation + dashboards**.
+This system allows citizens to submit complaints with images and location, and automatically categorizes and prioritizes them using an AI service. Admins can monitor, filter, and update complaint statuses in real time.
 
 ---
 
-## 🧠 Core Features (Planned & In Progress)
+## 🚀 Tech Stack
 
-### ✅ AI Features
-- NLP-based complaint categorization (working)
-- AI-based priority assignment (working)
-- Confidence-based fallback logic
-- Modular AI pipeline (working)
-- LLM-ready complaint summarization (next)
-
-### 🖥️ System Features
-- Citizen complaint submission (in progress)
-- Officer dashboard (in progress)
-- Admin analytics dashboard (in progress)
-- Real-time status tracking
-- Map-based visualization (planned)
-
----
-
-## 🏗️ Current Project Status
-**AI pipeline is completed and stable**
-
-✔ Dataset created  
-✔ Model trained (96% accuracy)  
-✔ Model saved and versioned  
-✔ Inference module ready  
-✔ Pipeline ready for backend integration  
-
-Backend & frontend development is currently ongoing.
-
----
-
-## 📁 Project Structure
-
-CivicMind/
-│
-├── ai/
-│ ├── data/ # complaint dataset
-│ ├── models/ # trained models (ignored in git)
-│ ├── training/ # training scripts
-│ ├── inference/ # inference logic
-│ └── pipeline.py # AI pipeline orchestrator
-│
-├── backend/ # FastAPI backend (WIP)
-├── frontend/ # React frontend (WIP)
-├── README.md
-└── .gitignore
-
-
-
----
-
-## 🧪 AI Pipeline (Implemented)
-
-Complaint Text
-↓
-NLP Classifier
-↓
-Priority Scoring
-↓
-Fallback Logic
-↓
-Structured Output → Backend
-
-
----
-
-## 🛠️ Tech Stack
-
-### AI / ML
-- Python
-- scikit-learn
-- TF-IDF + Logistic Regression
-- Joblib
-
-### Backend (in progress)
-- FastAPI
-- PostgreSQL
-
-### Frontend (in progress)
+### Frontend
 - React
-- Leaflet (maps)
+- Tailwind CSS
+- Axios
+- React Router
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT Authentication
+- Cloudinary
+
+### AI Service
+- Python
+- FastAPI
+- Uvicorn
 
 ---
 
-## 👥 Team Roles
-- **Team Lead & AI Lead:** Dev Patmase
-- Backend Developer: (assigned)
-- Frontend Developer: (assigned)
-- Integration & Deployment: (assigned)
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Clone Repository
+
+```bash
+git clone <your-repo-url>
+cd your-project-folder
+```
 
 ---
 
-## 📌 Notes
-- Models are not pushed to GitHub (by design)
-- This repo tracks clean code only
-- AI pipeline is stable and frozen
-- Focus now is integration & demo
+## 🖥 Backend Setup
+
+```bash
+cd backend
+npm install
+```
+
+Create `.env` inside backend:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection
+JWT_SECRET=your_secret_key
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_key
+CLOUDINARY_API_SECRET=your_secret
+AI_SERVICE_URL=http://localhost:8000/predict
+AI_SERVICE_TIMEOUT=10000
+```
+
+Run backend:
+
+```bash
+npm run dev
+```
+
+Backend runs on:  
+http://localhost:5000
 
 ---
 
-## 📅 Next Steps
-- Integrate AI pipeline with backend
-- Complete dashboards
-- Final demo flow
-- Deployment
-- Presentation prep
+## 🤖 AI Service Setup
+
+```bash
+cd ai-service
+python -m venv venv
+```
+
+Activate virtual environment:
+
+Windows:
+```bash
+venv\Scripts\activate
+```
+
+Mac/Linux:
+```bash
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run service:
+
+```bash
+uvicorn main:app --reload --port 8000
+```
+
+AI Service runs on:  
+http://localhost:8000
 
 ---
 
-## 🏁 Goal
-Deliver a **working AI-powered system**, not just a prototype.
+## 🌐 Frontend Setup
 
-This project is built with production mindset, not academic mindset.
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs on:  
+http://localhost:5173
+
+---
+
+
+## ✨ Features
+
+### Citizen
+- Register and Login
+- Submit complaint with image and location
+- Automatic AI-based category and priority detection
+- Track complaint status
+- View personal complaints
+
+### Admin
+- View all complaints
+- Filter by category and status
+- Update complaint status
+- Override category and priority
+- Analytics dashboard
+
+### AI
+- Text-based classification
+- Priority scoring system
+- Fallback handling on failure
+
+---
+
+## 📂 Project Structure
+
+```
+root/
+├── backend/
+├── frontend/
+└── ai-service/
+```
+
+---
+
+
+## 🔌 API Endpoints
+
+### Auth
+```
+POST /api/auth/register
+POST /api/auth/login
+```
+
+### Complaints
+```
+POST /api/complaints
+GET /api/complaints/my
+GET /api/complaints/:id
+```
+
+### Admin
+```
+GET /api/admin/complaints
+PATCH /api/admin/complaints/:id
+```
+
+---
+
+## 🛠 Environment Requirements
+
+- Node.js v18+
+- Python 3.9+
+- MongoDB Atlas or Local MongoDB
+- Cloudinary Account
+
+---
+
+## 🎯 Demo Flow
+
+1. Register as citizen  
+2. Submit complaint with image and location  
+3. AI automatically assigns category and priority  
+4. Login as admin  
+5. View, filter and update complaints  
+
+---
+
+## 🔮 Future Improvements
+
+- Image-based AI classification
+- Real-time updates with WebSockets
+- Map integration
+- Pagination and search
+- Docker-based deployment
+
+---
+
+## 📜 License
+
+Developed for educational and hackathon purposes.
