@@ -10,23 +10,40 @@ const AdminDashboard = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editComplaint, setEditComplaint] = useState(null);
 
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+
   useEffect(() => {
     fetchComplaints();
-  }, []);
+  }, [selectedCategory, selectedStatus]);
 
   useEffect(() => {
     const socket = io('http://localhost:5000');
 
     socket.on('newComplaint', (newComplaint) => {
-      setComplaints((prev) => [newComplaint, ...prev]);
+      const matchesCategory =
+        !selectedCategory || newComplaint.category === selectedCategory;
+
+      const matchesStatus =
+        !selectedStatus || newComplaint.status === selectedStatus;
+
+      if (matchesCategory && matchesStatus) {
+        setComplaints((prev) => [newComplaint, ...prev]);
+      }
     });
 
     return () => socket.disconnect();
-  }, []);
+  }, [selectedCategory, selectedStatus]);
 
   const fetchComplaints = async () => {
+    setLoading(true);
     try {
-      const { data } = await api.get('/admin/complaints');
+      const params = new URLSearchParams();
+      if (selectedCategory) params.append('category', selectedCategory);
+      if (selectedStatus) params.append('status', selectedStatus);
+
+      const { data } = await api.get(`/admin/complaints?${params.toString()}`);
+
       setComplaints(data.data);
     } catch (err) {
       console.error(err);
@@ -59,7 +76,46 @@ const AdminDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
-      <h2 className="text-3xl font-bold text-white mb-8">Admin Dashboard</h2>
+      <h2 className="text-3xl font-bold text-white mb-6">Admin Dashboard</h2>
+
+      {/* 🔹 FILTER SECTION */}
+      <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-4 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm text-slate-400 mb-2">
+            Filter by Category
+          </label>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded text-white"
+          >
+            <option value="">All Categories</option>
+            <option>Waste Management</option>
+            <option>Water Supply</option>
+            <option>Road Damage</option>
+            <option>Streetlights</option>
+            <option>Sanitation</option>
+            <option>Others</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm text-slate-400 mb-2">
+            Filter by Status
+          </label>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded text-white"
+          >
+            <option value="">All Status</option>
+            <option value="processing">processing</option>
+            <option value="open">open</option>
+            <option value="in-progress">in-progress</option>
+            <option value="resolved">resolved</option>
+          </select>
+        </div>
+      </div>
 
       {loading ? (
         <div className="text-center text-slate-400">Loading...</div>
@@ -68,12 +124,10 @@ const AdminDashboard = () => {
           {complaints.map((complaint) => (
             <div
               key={complaint._id}
-              className="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all"
+              className="bg-slate-800/80 border border-slate-700 rounded-2xl p-6"
             >
               <div className="flex flex-col lg:flex-row gap-8">
-                {/* LEFT SECTION */}
                 <div className="flex-1 space-y-4">
-                  {/* Header Row */}
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="text-blue-400 font-semibold text-lg">
                       {complaint.category}
@@ -96,64 +150,53 @@ const AdminDashboard = () => {
                     </span>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-slate-300 leading-relaxed">
-                    {complaint.description}
-                  </p>
+                  <p className="text-slate-300">{complaint.description}</p>
 
-                  {/* Address */}
                   {complaint.address && (
                     <div className="text-slate-400 text-sm">
                       📍 {complaint.address}
                     </div>
                   )}
 
-                  {/* User Info */}
-                  <div className="text-sm text-slate-400 space-y-1 pt-2 border-t border-slate-700">
-                    <div>👤 {complaint.userId?.name || 'Unknown'}</div>
+                  <div className="text-sm text-slate-400 space-y-1">
+                    <div>👤 {complaint.userId?.name}</div>
                     {complaint.userId?.phone && (
                       <div>📞 {complaint.userId.phone}</div>
                     )}
                     <div>
                       📅 {new Date(complaint.createdAt).toLocaleDateString()}
                     </div>
-                    <div>
-                      📌 {complaint.latitude.toFixed(4)},{' '}
-                      {complaint.longitude.toFixed(4)}
-                    </div>
                   </div>
                 </div>
 
-                {/* RIGHT SECTION */}
-                <div className="w-full lg:w-64 flex flex-col items-center gap-4">
+                <div className="w-full lg:w-64 flex flex-col gap-4">
                   {complaint.imageUrl && (
                     <img
                       src={complaint.imageUrl}
                       alt="Complaint"
                       onClick={() => setSelectedImage(complaint.imageUrl)}
-                      className="w-full h-48 object-cover rounded-xl cursor-pointer hover:opacity-80 transition"
+                      className="w-full h-48 object-cover rounded-xl cursor-pointer"
                     />
                   )}
 
-                  <div className="w-full flex flex-col gap-3">
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${complaint.latitude},${complaint.longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg text-center text-sm font-medium transition"
-                    >
-                      Open in Maps
-                    </a>
-                    <button
-                      onClick={() => {
-                        setEditComplaint(complaint);
-                        setEditModalOpen(true);
-                      }}
-                      className="bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg text-sm font-medium transition"
-                    >
-                      Edit
-                    </button>
-                  </div>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${complaint.latitude},${complaint.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 text-white py-2 rounded-lg text-center text-sm"
+                  >
+                    Open in Maps
+                  </a>
+
+                  <button
+                    onClick={() => {
+                      setEditComplaint(complaint);
+                      setEditModalOpen(true);
+                    }}
+                    className="bg-blue-600 text-white py-2 rounded-lg text-sm"
+                  >
+                    Edit
+                  </button>
                 </div>
               </div>
             </div>
@@ -161,107 +204,6 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {editModalOpen && editComplaint && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-lg">
-            <h3 className="text-xl font-semibold text-white mb-4">
-              Edit Complaint
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-slate-400 mb-1">
-                  Status
-                </label>
-                <select
-                  value={editComplaint.status}
-                  onChange={(e) =>
-                    setEditComplaint({
-                      ...editComplaint,
-                      status: e.target.value,
-                    })
-                  }
-                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
-                >
-                  <option value="processing">processing</option>
-                  <option value="open">open</option>
-                  <option value="in-progress">in-progress</option>
-                  <option value="resolved">resolved</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-slate-400 mb-1">
-                  Category
-                </label>
-                <select
-                  value={editComplaint.category}
-                  onChange={(e) =>
-                    setEditComplaint({
-                      ...editComplaint,
-                      category: e.target.value,
-                    })
-                  }
-                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
-                >
-                  <option>Waste Management</option>
-                  <option>Water Supply</option>
-                  <option>Road Damage</option>
-                  <option>Streetlights</option>
-                  <option>Sanitation</option>
-                  <option>Others</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-slate-400 mb-1">
-                  Priority
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={editComplaint.priority}
-                  onChange={(e) =>
-                    setEditComplaint({
-                      ...editComplaint,
-                      priority: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={async () => {
-                    await api.patch(`/admin/complaints/${editComplaint._id}`, {
-                      status: editComplaint.status,
-                      category: editComplaint.category,
-                      priority: editComplaint.priority,
-                    });
-
-                    setEditModalOpen(false);
-                    fetchComplaints();
-                  }}
-                  className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg"
-                >
-                  Save
-                </button>
-
-                <button
-                  onClick={() => setEditModalOpen(false)}
-                  className="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-2 rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Image Modal */}
       {selectedImage && (
         <div
           onClick={() => setSelectedImage(null)}
