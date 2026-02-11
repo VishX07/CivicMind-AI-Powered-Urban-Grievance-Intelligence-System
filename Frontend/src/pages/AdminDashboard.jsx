@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/AdminDashboard.jsx
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
