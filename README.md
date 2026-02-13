@@ -65,6 +65,28 @@ Admin monitors, filters and manages complaints in real time with live updates.
 ```bash
 git clone <repo-url>
 ```
+---
+
+## Docker
+
+dockerfile is available, if you have [docker](https://www.docker.com/#containers) installed run this command in root directory
+
+```bash
+docker compose up --watch
+```
+
+to find running containers
+```bash
+docker container ls 
+```
+
+to stop docker container
+```bash
+docker container stop <container-ids> # container ids from docker containers ls command
+```
+access frontend ui at https://localhost:3000
+
+**Note:** this dockerfile is for dev build, some chaneges can be made for final deployment build
 
 ---
 

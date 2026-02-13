@@ -1,0 +1,47 @@
+services:
+  frontend:
+    build: ./Frontend
+    ports:
+      - "3000:5173" # Access UI at localhost:3000
+    depends_on:
+      - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./Frontend/src
+          target: /app/src
+        - action: rebuild
+          path: ./Frontend/package.json
+
+  backend:
+    build: ./Backend
+    ports:
+      - "5000:5000"
+    environment:
+      - AI_SERVICE_URL=http://ai-service:8000
+      - FRONTEND_URL=http://localhost:3000
+    depends_on:
+      - ai-service
+    develop:
+      watch:
+        - action: sync
+          path: ./Backend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./Backend/package.json
+
+  ai-service:
+    build: ./Backend/ai-service
+    ports:
+      - "8000:8000"
+    develop:
+      watch:
+        - action: sync
+          path: ./Backend/ai-service
+          target: /app
+          ignore:
+            - __pycache__/
+        - action: rebuild
+          path: ./Backend/ai-service/requirements.txt
