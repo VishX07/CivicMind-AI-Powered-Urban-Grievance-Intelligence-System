@@ -58,7 +58,24 @@ Admin monitors, filters and manages complaints in real time with live updates.
 
 ---
 
-# 🚀 Installation & Run Instructions
+# Start project with Docker no need anything just 2 commands
+
+```bash
+git clone <repo-url>
+```
+
+```bash
+docker compose up
+```
+
+# Acess URL's
+
+Frontend: http://localhost:5173
+Backend: http://localhost:5000
+AI Service: http://localhost:8000
+Health Check: http://localhost:5000/api/health
+
+# 🚀 Full Installation & Run Instructions
 
 ## Clone Repository
 
