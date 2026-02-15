@@ -1,5 +1,7 @@
 # 🏙️ Smart Urban Grievance & Service Response System
 
+> ⚡ For better formatting and complete structure, please view this README directly on GitHub.
+
 <div align="center">
 
 ![Status](https://img.shields.io/badge/status-active-success.svg)
