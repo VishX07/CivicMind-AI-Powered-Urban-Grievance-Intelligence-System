@@ -1,35 +1,3 @@
-# version: '3.9'
-
-# services:
-
-#   ai-service:
-#     build:
-#       context: ./Backend/ai-service
-#     container_name: ai-service
-#     ports:
-#       - "8000:8000"
-
-#   backend:
-#     build:
-#       context: ./Backend
-#     container_name: backend
-#     ports:
-#       - "5000:5000"
-#     env_file:
-#       - ./Backend/.env
-#     depends_on:
-#       - ai-service
-
-#   frontend:
-#     build:
-#       context: ./Frontend
-#     container_name: frontend
-#     ports:
-#       - "5173:5173"
-#     depends_on:
-#       - backend
-
-
 version: "3.9"
 
 services:
@@ -37,29 +5,38 @@ services:
   ai-service:
     build:
       context: ./Backend/ai-service
+    ports:
+      - "8000:8000"
     restart: unless-stopped
-    expose:
-      - "8000"
 
   backend:
     build:
       context: ./Backend
-    restart: unless-stopped
     env_file:
       - ./Backend/.env
-    expose: 
-      - "5000"
+    ports:
+      - "5000:5000"
     depends_on:
       - ai-service
+    restart: unless-stopped
 
   frontend:
-    environment:
-     - VITE_API_URL=http://backend:5000
-
     build:
       context: ./Frontend
-    restart: unless-stopped
+      dockerfile: Dockerfile.dev
+    environment:
+    - VITE_API_URL=http://localhost:5000
     ports:
       - "5173:5173"
     depends_on:
       - backend
+    restart: unless-stopped
+
+  # frontend:
+  # build: ./frontend
+  # ports:
+  #   - "5173:5173"
+  # volumes:
+  #   - ./frontend:/app
+  #   - /app/node_modules
+  # command: npm run dev -- --host

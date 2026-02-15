@@ -31,3 +31,12 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+# frontend:
+#   build: ./frontend
+#   ports:
+#     - "5173:5173"
+#   volumes:
+#     - ./frontend:/app
+#     - /app/node_modules
+#   command: npm run dev -- --host
