@@ -217,6 +217,105 @@ const AdminDashboard = () => {
           />
         </div>
       )}
+      {editModalOpen && editComplaint && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-lg">
+            <h3 className="text-xl font-semibold text-white mb-4">
+              Edit Complaint
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">
+                  Status
+                </label>
+                <select
+                  value={editComplaint.status}
+                  onChange={(e) =>
+                    setEditComplaint({
+                      ...editComplaint,
+                      status: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
+                >
+                  <option value="processing">processing</option>
+                  <option value="open">open</option>
+                  <option value="in-progress">in-progress</option>
+                  <option value="resolved">resolved</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">
+                  Category
+                </label>
+                <select
+                  value={editComplaint.category}
+                  onChange={(e) =>
+                    setEditComplaint({
+                      ...editComplaint,
+                      category: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
+                >
+                  <option>Waste Management</option>
+                  <option>Water Supply</option>
+                  <option>Road Damage</option>
+                  <option>Streetlights</option>
+                  <option>Sanitation</option>
+                  <option>Others</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">
+                  Priority
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={editComplaint.priority}
+                  onChange={(e) =>
+                    setEditComplaint({
+                      ...editComplaint,
+                      priority: parseInt(e.target.value),
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-600 rounded text-white"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={async () => {
+                    await api.patch(`/admin/complaints/${editComplaint._id}`, {
+                      status: editComplaint.status,
+                      category: editComplaint.category,
+                      priority: editComplaint.priority,
+                    });
+
+                    setEditModalOpen(false);
+                    fetchComplaints();
+                  }}
+                  className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg"
+                >
+                  Save
+                </button>
+
+                <button
+                  onClick={() => setEditModalOpen(false)}
+                  className="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
