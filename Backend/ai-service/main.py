@@ -63,6 +63,9 @@ def calculate_priority(description: str) -> int:
     priority = max(0, min(priority, 10))
     
     return priority
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
 
 @app.get("/")
 def root():

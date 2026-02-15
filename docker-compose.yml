@@ -1,23 +1,65 @@
-version: '3.9'
+# version: '3.9'
+
+# services:
+
+#   ai-service:
+#     build:
+#       context: ./Backend/ai-service
+#     container_name: ai-service
+#     ports:
+#       - "8000:8000"
+
+#   backend:
+#     build:
+#       context: ./Backend
+#     container_name: backend
+#     ports:
+#       - "5000:5000"
+#     env_file:
+#       - ./Backend/.env
+#     depends_on:
+#       - ai-service
+
+#   frontend:
+#     build:
+#       context: ./Frontend
+#     container_name: frontend
+#     ports:
+#       - "5173:5173"
+#     depends_on:
+#       - backend
+
+
+version: "3.9"
 
 services:
+
   ai-service:
-    build: ./backend/ai-service
-    ports:
-      - '8000:8000'
+    build:
+      context: ./Backend/ai-service
+    restart: unless-stopped
+    expose:
+      - "8000"
 
   backend:
-    build: ./backend
-    ports:
-      - '5000:5000'
+    build:
+      context: ./Backend
+    restart: unless-stopped
     env_file:
-      - ./backend/.env
+      - ./Backend/.env
+    expose: 
+      - "5000"
     depends_on:
       - ai-service
 
   frontend:
-    build: ./frontend
+    environment:
+     - VITE_API_URL=http://backend:5000
+
+    build:
+      context: ./Frontend
+    restart: unless-stopped
     ports:
-      - '5173:5173'
+      - "5173:5173"
     depends_on:
       - backend

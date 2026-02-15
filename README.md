@@ -65,7 +65,7 @@ git clone <repo-url>
 ```
 
 ```bash
-docker compose up
+docker compose -f docker-compose.dev.yml up --build
 ```
 
 # Acess URL's

@@ -57,7 +57,7 @@ export const createComplaint = async (req, res) => {
     await complaint.save();
 
     // Populate userId before emitting
-    await complaint.populate('userId', 'name email');
+    await complaint.populate('userId', 'name email phone');
 
     // Emit real-time update to all connected clients
     io.emit('newComplaint', complaint);

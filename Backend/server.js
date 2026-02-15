@@ -11,14 +11,14 @@ import complaintRoutes from './routes/complaintRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
-
+const allowedOrigin = process.env.FRONTEND_URL || '*';
 const app = express();
 const httpServer = createServer(app);
 
 // Initialize Socket.IO
 export const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: allowedOrigin,
     credentials: true,
   },
 });
@@ -27,10 +27,11 @@ connectDB();
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: allowedOrigin,
     credentials: true,
   }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -66,5 +67,8 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} http://localhost:5000`);
+  console.log(`Server running on port ${PORT}`);
 });
+
+import errorHandler from './middleware/errorHandler.js';
+app.use(errorHandler);
