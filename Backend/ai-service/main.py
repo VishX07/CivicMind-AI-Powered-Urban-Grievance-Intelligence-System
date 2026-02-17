@@ -170,15 +170,26 @@ def health():
 def root():
     return {"message": "AI Service Running", "status": "ok"}
 
+# @app.post("/predict", response_model=PredictResponse)
+# def predict(request: PredictRequest):
+#     category = classify_category(request.description)
+#     priority = calculate_priority(request.description)
+    
+#     return PredictResponse(
+#         category=category,
+#         priority=priority
+#     )
+
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest):
     category = classify_category(request.description)
-    priority = calculate_priority(request.description)
-    
+    priority = calculate_priority(request.description, category)
+
     return PredictResponse(
         category=category,
         priority=priority
     )
+
 
 if __name__ == "__main__":
     import uvicorn
