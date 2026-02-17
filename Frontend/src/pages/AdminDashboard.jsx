@@ -135,6 +135,7 @@ const AdminDashboard = () => {
                 <option className="text-black">Road Damage</option>
                 <option className="text-black">Streetlights</option>
                 <option className="text-black">Sanitation</option>
+                <option className="text-black">Testing</option>
                 <option className="text-black">Others</option>
               </select>
             </div>
