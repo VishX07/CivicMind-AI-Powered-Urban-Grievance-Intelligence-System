@@ -1,0 +1,7 @@
+transformers==4.35.2
+numpy==1.26.4
+pyyaml==6.0.1
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+# 

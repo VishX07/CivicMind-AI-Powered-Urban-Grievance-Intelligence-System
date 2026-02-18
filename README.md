@@ -234,7 +234,8 @@ pip install -r requirements.txt
 #### Start AI Service
 
 ```bash
-uvicorn main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8000
+
 ```
 
 ✅ AI Service will run on **http://localhost:8000**

@@ -130,13 +130,24 @@ const AdminDashboard = () => {
                 <option className="text-black" value="">
                   All Categories
                 </option>
-                <option className="text-black">Waste Management</option>
+                {/* <option className="text-black">Waste Management</option>
                 <option className="text-black">Water Supply</option>
                 <option className="text-black">Road Damage</option>
                 <option className="text-black">Streetlights</option>
                 <option className="text-black">Sanitation</option>
                 <option className="text-black">Testing</option>
-                <option className="text-black">Others</option>
+                <option className="text-black">Others</option> */}
+                <option className="text-black">Public Property Damage</option>
+                <option className="text-black">Electricity Issue</option>
+                <option className="text-black">Illegal Construction</option>
+                <option className="text-black">Drainage Issue</option>
+                <option className="text-black">Street Lights</option>
+                <option className="text-black">Garbage Collection</option>
+                <option className="text-black">Encroachment</option>
+                <option className="text-black">Noise Pollution</option>
+                <option className="text-black">Stray Animals</option>
+                <option className="text-black">Tree Related</option>
+                <option className="text-black">Other</option>
               </select>
             </div>
 
@@ -376,12 +387,25 @@ const AdminDashboard = () => {
                     }
                     className="w-full px-4 py-3 bg-white/5 border-2 border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   >
-                    <option className="text-black">Waste Management</option>
+                    {/* <option className="text-black">Waste Management</option>
                     <option className="text-black">Water Supply</option>
                     <option className="text-black">Road Damage</option>
                     <option className="text-black">Streetlights</option>
                     <option className="text-black">Sanitation</option>
-                    <option className="text-black">Others</option>
+                    <option className="text-black">Others</option> */}
+                    <option className="text-black">
+                      Public Property Damage
+                    </option>
+                    <option className="text-black">Electricity Issue</option>
+                    <option className="text-black">Illegal Construction</option>
+                    <option className="text-black">Drainage Issue</option>
+                    <option className="text-black">Street Lights</option>
+                    <option className="text-black">Garbage Collection</option>
+                    <option className="text-black">Encroachment</option>
+                    <option className="text-black">Noise Pollution</option>
+                    <option className="text-black">Stray Animals</option>
+                    <option className="text-black">Tree Related</option>
+                    <option className="text-black">Other</option>
                   </select>
                 </div>
 

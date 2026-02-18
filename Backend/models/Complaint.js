@@ -105,6 +105,19 @@ const complaintSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    // category: {
+    //   type: String,
+    //   enum: [
+    //     'Waste Management',
+    //     'Water Supply',
+    //     'Road Damage',
+    //     'Streetlights',
+    //     'Sanitation',
+    //     'Others',
+    //   ],
+    //   default: 'Others',
+    // },
+
     category: {
       type: String,
       enum: [
@@ -114,9 +127,22 @@ const complaintSchema = new mongoose.Schema(
         'Streetlights',
         'Sanitation',
         'Others',
+
+        // New Categories
+        'Public Property Damage',
+        'Electricity Issue',
+        'Illegal Construction',
+        'Drainage Issue',
+        'Street Lights',
+        'Garbage Collection',
+        'Encroachment',
+        'Noise Pollution',
+        'Stray Animals',
+        'Tree Related',
       ],
       default: 'Others',
     },
+
     priority: {
       type: Number,
       min: 0,

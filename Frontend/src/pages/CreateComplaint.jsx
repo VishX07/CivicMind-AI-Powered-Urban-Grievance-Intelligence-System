@@ -51,6 +51,7 @@ const CreateComplaint = () => {
     if (file) {
       setImage(file);
       const reader = new FileReader();
+
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
