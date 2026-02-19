@@ -90,6 +90,7 @@ export const updateComplaint = async (req, res) => {
       data: complaint,
     });
   } catch (error) {
+    console.log('Error updating complaint:', error);
     res.status(500).json({
       success: false,
       message: error.message,
