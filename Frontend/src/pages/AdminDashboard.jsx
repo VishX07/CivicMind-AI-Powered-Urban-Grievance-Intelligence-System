@@ -66,8 +66,9 @@ const AdminDashboard = () => {
       await api.patch(`/admin/complaints/${editComplaint._id}`, {
         status: editComplaint.status,
         category: editComplaint.category,
-        priority: editComplaint.priority,
+        priority: Number(editComplaint.priority),
       });
+
       setEditModalOpen(false);
       fetchComplaints();
     } catch (error) {
