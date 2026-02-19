@@ -45,7 +45,17 @@ export const updateComplaint = async (req, res) => {
       'Road Damage',
       'Streetlights',
       'Sanitation',
-      'Others',
+      'Public Property Damage',
+      'Electricity Issue',
+      'Illegal Construction',
+      'Drainage Issue',
+      'Street Lights',
+      'Garbage Collection',
+      'Encroachment',
+      'Noise Pollution',
+      'Stray Animals',
+      'Tree Related',
+      'Other',
     ];
     const validStatuses = ['processing', 'open', 'in-progress', 'resolved'];
 

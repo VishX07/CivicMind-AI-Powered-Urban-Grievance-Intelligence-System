@@ -126,9 +126,6 @@ const complaintSchema = new mongoose.Schema(
         'Road Damage',
         'Streetlights',
         'Sanitation',
-        'Others',
-
-        // New Categories
         'Public Property Damage',
         'Electricity Issue',
         'Illegal Construction',
