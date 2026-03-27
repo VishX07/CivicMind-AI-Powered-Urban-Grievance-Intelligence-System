@@ -136,8 +136,8 @@ const complaintSchema = new mongoose.Schema(
         'Noise Pollution',
         'Stray Animals',
         'Tree Related',
-      ],
-      default: 'Others',
+        'Others'
+      ]
     },
 
     priority: {
